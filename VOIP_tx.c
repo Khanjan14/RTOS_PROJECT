@@ -1,8 +1,8 @@
 /*****************************/
-/*Titel: Assignment4_Client.c*/
+/*   Titel: VOIP_rx.c        */
 /*   Author: Khanjan Desai   */
-/*   Date  : Feb 11, 2016    */
-/* Client program to execute */
+/*   Date  : March 4,2016    */
+/* VOIP server Transmit voice*/
 /*Client-Server using Socket */
 /*****************************/
 
