@@ -18,10 +18,72 @@
 #include <fcntl.h>
 #include <pulse/simple.h>
 #include <pulse/error.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <time.h>
+#include <errno.h>
 #define BUFSIZE 1024
 
-int main(void)
+int sockfd = 0, n,i;
+
+
+void handler(int signo)
 {
+    	if(signo = SIGINT)
+    	{
+		printf("Shut down");
+		int ret = close(sockfd);
+		sleep(1);
+		if(ret == -1)	
+		{	
+			printf("Closing Error");
+		}
+		exit(1);
+	}
+}
+
+
+
+int main(int argc, char *argv[])
+{
+
+	// Read IP and port
+    	char * ip = argv[1];
+    	int ip1 = atoi(argv[2]);	
+    	struct sockaddr_in serv_addr; 
+
+	// Signal Handler
+    	if(signal(SIGINT,handler) == SIG_ERR)
+    	{
+		printf("Cant recieve signal");
+    	}    
+
+
+	
+        // Error check for sockfd
+    	if ((sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))<0)
+	{
+		perror("sockfd error:");
+	}
+    	memset(&serv_addr, '0', sizeof(serv_addr)); 
+
+    	serv_addr.sin_family = AF_INET;
+    	serv_addr.sin_addr.s_addr = inet_addr(ip);	// Give IP
+    	serv_addr.sin_port = htons(ip1); 		// Give Port
+
+
+     
+    	int con;
+	//Error check for Connect    
+    	if((con  = connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr))) < 0)
+    	{	
+       		perror("Error in connect call :");
+       		return 1;
+    	}
+
 	//create Spec that defines samplerate, channels and format
 	const pa_sample_spec spec = {
 		.format = PA_SAMPLE_S16LE,
@@ -50,12 +112,18 @@ int main(void)
 			exit(0);
 		}
 
-		//Write data if run using PIPE with rx
-		if (write(STDOUT_FILENO,buf,BUFSIZE) < 0)
+	//send if using socket
+		if(send(sockfd,buf,BUFSIZE,0) < 0)
+		{
+			perror("Send failed\n");
+			exit(0);
+		}
+	//Write data if run using PIPE with rx
+/*		if (write(STDOUT_FILENO,buf,BUFSIZE) < 0)
 		{
 			perror(": Write failed\n");
 			exit(0);
-		}
+		}*/
 	}
 
 	// Relese Memory
@@ -64,7 +132,6 @@ int main(void)
 		free(record_tx);
 	}
 }
-
 
 
 
