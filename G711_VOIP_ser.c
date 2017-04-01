@@ -31,7 +31,7 @@
 #include <time.h>
 #include <errno.h>
 #include "G711.c"
-#define BUFSIZE 1024
+#define BUFSIZE 4096
 
 int listenfd = 0, connfd = 0;
 pa_simple *rx_play = NULL;
@@ -42,8 +42,8 @@ int error;
 static jmp_buf buf;
 void signal_handler (int sig)
 {
-	int buf[BUFSIZE],buf1[BUFSIZE];
-	int r=0;
+	int16_t buf[BUFSIZE],buf1[BUFSIZE];
+	int16_t r=0;
 
 	if(sig == SIGINT)
 	{
@@ -70,7 +70,7 @@ void signal_handler (int sig)
 		}
 		for(int i =0; i<BUFSIZE;i++)
 		{
-			buf1[i] = ulaw2linear(buf[i]);
+			buf1[i] = alaw2linear(buf[i]);
 		}
 		// Play data
 		if(pa_simple_write(rx_play,buf1,BUFSIZE,&error) < 0)
