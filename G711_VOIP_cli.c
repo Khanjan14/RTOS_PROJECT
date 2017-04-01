@@ -28,14 +28,14 @@
 #include <time.h>
 #include <errno.h>
 #include "G711.c"
-#define BUFSIZE 1024
+#define BUFSIZE 4096
 
 int sockfd = 0, n,i;
 pa_simple *record_tx = NULL;
 int error; 
 struct sockaddr_in serv_addr; 
 
-int buf[BUFSIZE],buf1[BUFSIZE];
+int16_t buf[BUFSIZE],buf1[BUFSIZE];
 
 void signal_handler (int sig)
 {
@@ -61,10 +61,10 @@ void signal_handler (int sig)
 		}
 		for(int i=0;i<BUFSIZE;i++)
 		{
-			buf1[i] = linear2ulaw(buf[i]);
+			buf1[i] = linear2alaw(buf[i]);
 		}
 		//send if using socket
-		if(send(sockfd,buf,BUFSIZE,0) < 0)
+		if(send(sockfd,buf1,BUFSIZE,0) < 0)
 		{
 			perror("Send failed\n");
 			exit(0);
@@ -131,7 +131,7 @@ int main (int argc, char ** argv)
 	}
 
 	// Starting clock at 10 us and repeat every 10us.
-    ualarm (6000, 6000);
+    ualarm (10, 10);
     while(1)
     	pause();
     	
