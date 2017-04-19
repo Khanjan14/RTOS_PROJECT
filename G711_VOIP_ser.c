@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 	}
 
 		
-    ualarm (10, 10);
+    ualarm (6000, 6000);
     
 	
 	while(1)
