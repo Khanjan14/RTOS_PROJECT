@@ -35,6 +35,9 @@ pa_simple *record_tx = NULL;
 int error; 
 struct sockaddr_in serv_addr; 
 
+int t1,t2,t;
+float bw;
+
 int16_t buf[BUFSIZE],buf1[BUFSIZE];
 
 void signal_handler (int sig)
@@ -64,11 +67,16 @@ void signal_handler (int sig)
 			buf1[i] = linear2alaw(buf[i]);
 		}
 		//send if using socket
+		t1 = clock();	
 		if(send(sockfd,buf1,BUFSIZE,0) < 0)
 		{
 			perror("Send failed\n");
 			exit(0);
 		}
+		t2= clock();
+		t=t2-t1;
+		bw = 1024*8/t;
+		printf("%f MHz\n",bw);	
 	}
 }
 
@@ -131,7 +139,7 @@ int main (int argc, char ** argv)
 	}
 
 	// Starting clock at 10 us and repeat every 10us.
-    ualarm (10, 10);
+    ualarm (6000, 6000);
     while(1)
     	pause();
     	
